@@ -1,0 +1,26 @@
+# Core
+Django==4.2.11
+djangorestframework==3.15.1
+django-cors-headers==4.3.1
+
+# Database
+psycopg2-binary==2.9.9
+
+# Celery
+celery==5.3.6
+django-celery-beat==2.6.0
+django-celery-results==2.5.1
+redis==5.0.3
+
+# Shopify
+ShopifyAPI==12.6.0
+
+# Utils
+python-decouple==3.8
+django-extensions==3.2.3
+
+# Dev
+ipython==8.22.2
+
+# HTTP
+requests==2.31.0
