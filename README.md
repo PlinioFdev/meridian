@@ -4,7 +4,9 @@ A full-stack analytics dashboard that connects to the Shopify API, syncs real st
 
 Built as a portfolio project to demonstrate production-grade backend architecture with Django, async data pipelines with Celery, and a React dashboard with live data.
 
-![Dashboard](https://via.placeholder.com/1200x600?text=Meridian+Dashboard)
+![Dashboard](docs/dashboard.png)
+
+![Products & Cohort](docs/products.png)
 
 ## Architecture
 
