@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from apps.stores.views import ShopifyInstallView, ShopifyCallbackView
-from apps.api.views import OverviewView, RevenueView, ProductsView, CustomersView, SyncStatusView
+from apps.api.views import OverviewView, RevenueView, ProductsView, CustomersView, SyncStatusView, CohortView, GrowthView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -11,5 +11,7 @@ urlpatterns = [
     path('api/metrics/revenue/', RevenueView.as_view()),
     path('api/metrics/products/', ProductsView.as_view()),
     path('api/metrics/customers/', CustomersView.as_view()),
+    path('api/metrics/cohort/', CohortView.as_view()),
+    path('api/metrics/growth/', GrowthView.as_view()),
     path('api/sync/status/', SyncStatusView.as_view()),
 ]

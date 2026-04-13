@@ -68,3 +68,64 @@ class SyncStatusView(APIView):
         store = ShopifyStore.objects.filter(is_active=True).first()
         jobs = SyncJob.objects.filter(store=store).order_by('-created_at')[:10]
         return Response(SyncJobSerializer(jobs, many=True).data)
+
+
+from apps.analytics.cohort import compute_cohort_retention
+from datetime import date, timedelta
+
+
+class CohortView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        store = ShopifyStore.objects.filter(is_active=True).first()
+        if not store:
+            return Response({'error': 'No active store'}, status=404)
+        data = compute_cohort_retention(store.id)
+        return Response(data)
+
+
+class GrowthView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        store = ShopifyStore.objects.filter(is_active=True).first()
+        if not store:
+            return Response({'error': 'No active store'}, status=404)
+
+        today = date.today()
+        this_month_start = today.replace(day=1)
+        last_month_start = (this_month_start - timedelta(days=1)).replace(day=1)
+        last_month_end = this_month_start - timedelta(days=1)
+
+        this_month = DailyRevenueSnapshot.objects.filter(
+            store=store, date__gte=this_month_start
+        ).aggregate(revenue=Sum('revenue'), orders=Sum('orders_count'))
+
+        last_month = DailyRevenueSnapshot.objects.filter(
+            store=store, date__gte=last_month_start, date__lte=last_month_end
+        ).aggregate(revenue=Sum('revenue'), orders=Sum('orders_count'))
+
+        def growth(current, previous):
+            if not previous or previous == 0:
+                return None
+            return round(((current - previous) / previous) * 100, 1)
+
+        return Response({
+            'this_month': {
+                'revenue': this_month['revenue'] or 0,
+                'orders': this_month['orders'] or 0,
+            },
+            'last_month': {
+                'revenue': last_month['revenue'] or 0,
+                'orders': last_month['orders'] or 0,
+            },
+            'revenue_growth': growth(
+                float(this_month['revenue'] or 0),
+                float(last_month['revenue'] or 0)
+            ),
+            'orders_growth': growth(
+                this_month['orders'] or 0,
+                last_month['orders'] or 0
+            ),
+        })
